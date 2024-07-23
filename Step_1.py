@@ -8,8 +8,8 @@ pygame.display.set_caption("Frogger")
 
 frog_size = 25
 frog_x = screenW//2
-frog_y = screenH // 2 
-frog_speed = 1
+frog_y = screenH - frog_size
+frog_speed = 5
 
 def redraw():
     win.fill("black")
@@ -28,6 +28,10 @@ while running:
         frog_x += frog_speed
     elif keys[pygame.K_LEFT]:
         frog_x -= frog_speed
+    elif keys[pygame.K_UP]:
+        frog_y -= frog_speed
+    elif keys [pygame.K_DOWN]:
+        frog_y += frog_speed
 
     redraw()
 
