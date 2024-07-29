@@ -1,6 +1,7 @@
 #working backwords - classes and numbers changes 
 
 import pygame
+from random import randrange
 
 class Player:
     def __init__(self, x, y, size, speed):
@@ -43,12 +44,14 @@ class Game:
         self.frog_size = 25
         self.frog_speed = 2
         self.frog = Player(self.screenW // 2, self.screenH - self.frog_size, self.frog_size, self.frog_speed)
-
-        self.log_per_row = 5
-        self.log_rownum = 4 
+        #self.log_length = randrange(self.screenW/2,self.screenW) /  (self.log_per_row + (self.log_per_row -1))
+        self.log_per_row = 4
+        self.log_rownum = 4
+        self.log_length = 70
         self.logs_startY = 50
-        self.LOG_SPEED = 2
-        self.log_length = self.screenW /  (self.log_per_row + (self.log_per_row -1))
+        self.Log_speed = 1
+        
+        
         self.water_size = 200
         self.vert_btw_logs = self.frog_size / 5
         self.log_height = self.water_size / self.log_rownum
@@ -56,12 +59,12 @@ class Game:
 
         self.water = pygame.Rect(0, self.logs_startY, self.screenW, self.water_size + ((self.frog_size / 5) * (self.log_rownum - 1)))
 
-        self.trucks_per_row = 3
+        self.trucks_per_row = 4
         self.truck_rownum = 4
         self.truck_startY = 400
-        self.TRUCK_SPEED = 1
-        self.truck_length = self.screenW / (self.trucks_per_row + (self.trucks_per_row -1))
+        self.truck_length = 70
         self.truck_height = 30
+        self.truck_speed = 1
         self.vert_btw_trucks = self.frog_size * 1.5
         self.trucks = self.create_trucks()
 
@@ -69,12 +72,13 @@ class Game:
         logs = []
         dir = 1
         y_pos = self.logs_startY
-        x_pos = 0 
+        x_pos = randrange (0,self.screenW)
         for i in range(self.log_per_row * self.log_rownum):
-            logs.append({'x': x_pos, 'y': y_pos, 'dir': dir * self.LOG_SPEED})
-            x_pos += (self.log_length * 2)
+            logs.append({'x': x_pos, 'y': y_pos, 'dir': dir * self.Log_speed})
+            x_pos += ((-1*dir) *(self.log_length + randrange(self.log_length,self.log_length*2)))
             if (i + 1) % self.log_per_row == 0: 
-                x_pos = 0 
+                self.Log_speed += (dir*(randrange(1,6))/10)
+                x_pos = 0
                 dir = dir * -1
                 y_pos += (self.log_height + self.vert_btw_logs)
         return logs
@@ -83,14 +87,15 @@ class Game:
         trucks = []
         dir = 1
         y_pos = self.truck_startY
-        x_pos = 0
+        x_pos = randrange (0,self.screenW)
         for i in range(self.trucks_per_row * self.truck_rownum):
-            trucks.append({'x': x_pos, 'y': y_pos, 'dir': dir * self.TRUCK_SPEED})
-            x_pos += ( self.truck_length *2)
+            trucks.append({'x': x_pos, 'y': y_pos, 'dir': dir * self.truck_speed})
+            x_pos += ((-1*dir) *(self.truck_length + randrange(self.truck_length,self.truck_length*2)))
             if (i + 1) % self.trucks_per_row == 0: 
+                self.truck_speed += (dir*(randrange(1,6))/10)
                 x_pos = 0 
                 dir = dir * -1
-                y_pos += (self.truck_height + self.vert_btw_trucks)
+                y_pos += (self.truck_height + self.vert_btw_trucks)   
         return trucks
 
     def log(self):
@@ -105,7 +110,8 @@ class Game:
         for truck in self.trucks:
             truck['x'] += truck['dir']
             if truck['dir'] > 0 and truck['x'] > self.screenW:
-                truck['x'] = -self.truck_length
+               # truck['x'] = -(self.truck_length + randrange(self.truck_length,self.truck_length*2))
+               truck['x'] = -self.truck_length
             elif truck['dir'] < 0 and truck['x'] < 0 - self.truck_length:
                 truck['x'] = self.screenW
             truck_rect = pygame.Rect(truck['x'], truck['y'], self.truck_length, self.truck_height)
@@ -137,7 +143,7 @@ class Game:
             self.truck(frog_rect)
             self.redraw()
 
-            if self.frog.y == 0:
+            if self.frog.y <= 0:
                 self.frog.win_game()
 
             on_log = False
