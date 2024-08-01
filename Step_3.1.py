@@ -1,65 +1,70 @@
 #1 truck 
-
-import pygame 
-
-def game():
-    pygame.init()
-
-    screenW = 600
-    screenH = 800
-    win = pygame.display.set_mode((screenW,screenH))
-    pygame.display.set_caption("Frogger")
-
-    frog_size = 25
-    frog_x = screenW//2
-    frog_y = screenH - frog_size
-    frog_speed = 1 
-
-    trucks = [{'x': 400, 'y': 395,   'dir': 1}]
-    truck_length = 600/ 5
-    truck_height = 30       
-
-    running = True
-    while running:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-
-        keys = pygame.key.get_pressed()
-        frog_x, frog_y = move(keys, frog_x, frog_y, frog_speed, screenW, screenH, frog_size)
-        truck(trucks, truck_length, screenW)
-
-        redraw(win, frog_x, frog_y, frog_size,trucks, truck_length, truck_height)
-    pygame.quit()
-
-def truck(trucks, truck_length, screenW):
-    for truck in trucks:
-        truck['x'] += truck ['dir']
-        if truck['dir'] == 1 and truck['x'] > screenW:
-            truck['x'] = - truck_length
-        
+import pygame
 
 
+class Player:
+    def __init__(self, x, y, size, speed):
+        self.x = x
+        self.y = y
+        self.size = size
+        self.speed = speed
 
-def move(keys, frog_x, frog_y, frog_speed, screenW, screenH, frog_size):
-    if keys[pygame.K_RIGHT]and frog_x < screenW - frog_size:
-        frog_x += frog_speed
-    elif keys[pygame.K_LEFT] and frog_x > 0:
-        frog_x -= frog_speed
-    elif keys[pygame.K_UP] and frog_y > 0:
-        frog_y -= frog_speed
-    elif keys [pygame.K_DOWN] and frog_y < screenH - frog_size:
-        frog_y += frog_speed
-    return frog_x, frog_y
+    def move(self, keys, screenW, screenH):
+        if keys[pygame.K_RIGHT] and self.x < screenW - self.size:
+            self.x += self.speed
+        elif keys[pygame.K_LEFT] and self.x > 0:
+            self.x -= self.speed
+        elif keys[pygame.K_UP] and self.y > 0:
+            self.y -= self.speed
+        elif keys[pygame.K_DOWN] and self.y < screenH - self.size:
+            self.y += self.speed
 
 
-def redraw(win, frog_x, frog_y, frog_size,trucks, truck_length, truck_height):
-    win.fill("black")
-    pygame.draw.rect(win, ('green'), (frog_x, frog_y, frog_size, frog_size))
-    for truck in trucks:#***
-        pygame.draw.rect(win,('red'), (truck['x'],truck['y'],truck_length,truck_height))#***
-    pygame.display.update ()
+class Game:
+    def __init__(self):
+        pygame.init()
+        self.screenW = 800
+        self.screenH = 800
+        self.win = pygame.display.set_mode((self.screenW, self.screenH))
+        pygame.display.set_caption("Frogger")
 
+        self.frog_size = 25
+        self.frog_speed = 2
+        self.frog = Player(self.screenW // 2, self.screenH - self.frog_size, self.frog_size, self.frog_speed)
+    
+        self.trucks_per_row = 4
+        self.truck_startY = 400
+        self.truck_height = 30
+        self.vert_btw_trucks = self.frog_size * 1.5
+        self.trucks = {'x': 0 , 'y': 400, 'dir': 1, 'length': 70}
+
+
+    def truck(self):
+        self.trucks['x'] += self.trucks['dir']
+        if self.trucks['dir'] > 0 and self.trucks['x'] > self.screenW:
+                self.trucks['x'] = -self.trucks['length']
+       
+    def redraw(self):
+        self.win.fill("black")
+        pygame.draw.rect(self.win, 'red', (self.trucks['x'],self.trucks['y'], self.trucks['length'], self.truck_height))
+        pygame.draw.rect(self.win, 'green', (self.frog.x, self.frog.y, self.frog.size, self.frog.size))
+        pygame.display.update()
+
+    def run(self):
+        running = True
+        while running:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+
+            keys = pygame.key.get_pressed()
+            self.frog.move(keys, self.screenW, self.screenH)
+            self.truck()
+            self.redraw()
+
+
+        pygame.quit()
 
 if __name__ == "__main__":
-    game()
+    game = Game()
+    game.run()

@@ -1,4 +1,5 @@
-#randomize the size and spacing of 1 row of trucks
+#random speed differences for trucks
+
 import pygame
 from random import randrange
 
@@ -39,9 +40,11 @@ class Game:
     
 
         self.trucks_per_row = 4
+        self.truck_rownum = 4
         self.truck_startY = 400
         self.truck_n_space = self.screenW/self.trucks_per_row
         self.truck_height = 30
+        self.truck_speed = 1
         self.vert_btw_trucks = self.frog_size * 1.5
         self.trucks = self.create_trucks()
 
@@ -51,10 +54,15 @@ class Game:
         dir = 1
         y_pos = self.truck_startY
         x_pos = 0 
-        for i in range(self.trucks_per_row):
+        for i in range(self.trucks_per_row * self.truck_rownum):
             truck_length = (self.truck_n_space /randrange(2, 4)) 
             x_pos += self.truck_n_space
-            trucks.append({'x': x_pos, 'y': y_pos, 'dir': dir , 'length': truck_length})
+            trucks.append({'x': x_pos, 'y': y_pos, 'dir': dir * self.truck_speed, 'length': truck_length})
+            if (i + 1) % self.trucks_per_row == 0: 
+                self.truck_speed += (dir * (randrange(1, 6)) / 10)
+                x_pos = 0
+                dir = dir * -1
+                y_pos += (self.truck_height + self.vert_btw_trucks)
         return trucks
 
     def truck(self, frog_rect):
